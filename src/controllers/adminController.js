@@ -57,7 +57,43 @@ const getAllApplications = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+// Verify / Update an application
+const verifyApplication = async (req, res) => {
+  try {
+    const { status, employerNotes } = req.body;
 
+    const application = await Application.findByIdAndUpdate(
+      req.params.id,
+      { status, employerNotes },
+      { new: true }
+    );
+
+    if (!application)
+      return res.status(404).json({ message: "Application not found" });
+
+    res.json({ message: "Application updated successfully", application });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+// ✅ Verify / update a user
+const verifyUser = async (req, res) => {
+  try {
+    const { isVerified } = req.body; // true/false
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isVerified },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User verification updated successfully", user });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
 // ✅ Delete a user (dangerous, use carefully)
 const deleteUser = async (req, res) => {
   try {
@@ -88,5 +124,5 @@ module.exports = {
   getAllJobs,
   getAllApplications,
   deleteUser,
-  deleteJob,
+  deleteJob,verifyApplication, verifyUser
 };
