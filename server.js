@@ -13,13 +13,27 @@ const chatRoutes = require("./src/routes/chatRoutes");
 
 dotenv.config() 
 connectDB();
-           var corsOptions = {
-            origin: process.env.FRONTEND_URL,
-             optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-                        }
+  const allowedOrigins = [
+  "http://localhost:5173",
+  "https://job-nest-client-d5jq.vercel.app"
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+       
 const PORT=process.env.PORT
 //Middlewares
-app.use(cors(corsOptions));
+
 app.use(express.json())//accepts all requests
 
 app.use("/api/user",authRoutes)
