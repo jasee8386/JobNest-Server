@@ -15,7 +15,7 @@ dotenv.config()
 connectDB();
   const allowedOrigins = [
   "http://localhost:5173",
-  "https://job-nest-client-d5jq.vercel.app"
+  "https://job-nest-client-fq77xe8ws-jaseenacs-projects.vercel.app/"
 ];
 
 app.use(
