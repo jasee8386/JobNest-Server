@@ -28,6 +28,18 @@ const updateProfile = async (req, res) => {
     console.error("UpdateProfile Error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
+};// 🔹 Get logged-in user's full profile
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error("GetUserProfile Error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };
 
-module.exports = { updateProfile };
+module.exports = { updateProfile,getUserProfile  };

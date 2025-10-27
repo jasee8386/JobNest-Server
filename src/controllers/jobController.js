@@ -4,9 +4,12 @@ const Application = require("../models/Application");
 // Get all verified jobs
 const getJobs = async (req, res) => {
   try {
-      const { search } = req.query;
-    let query = { isVerified: true, status: "Open" };
+       const { search, category, page = 1, limit = 6 } = req.query;
 
+    // ✅ Only verified and open jobs
+    const query = { isVerified: true, status: "Open" };
+
+    // 🔍 Search by title, location, or skills
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
@@ -14,10 +17,30 @@ const getJobs = async (req, res) => {
         { skillsRequired: { $in: [new RegExp(search, "i")] } },
       ];
     }
-    
-    const jobs = await Job.find({ isVerified: true, status: "Open" });
-    res.json(jobs);
+
+    // 🏷 Filter by category
+    if (category && category !== "All") {
+      query.category = category;
+    }
+
+    // 🧾 Pagination
+    const skip = (page - 1) * limit;
+
+    const jobs = await Job.find(query)
+      .populate("employer", "name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Job.countDocuments(query);
+
+    res.json({
+      jobs,
+      totalPages: Math.ceil(total / limit),
+      totalJobs: total,
+    });
   } catch (err) {
+   console.error("Error fetching jobs:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
