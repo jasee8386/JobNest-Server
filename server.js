@@ -15,15 +15,18 @@ dotenv.config()
 connectDB();
   const allowedOrigins = [
   "http://localhost:5173",
-  "https://job-nest-client-fq77xe8ws-jaseenacs-projects.vercel.app/"
+  /\.vercel\.app$/,
 ];
 
 app.use(
-  cors({
+   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.some(o =>
+        typeof o === "string" ? o === origin : o.test(origin)
+      )) {
         callback(null, true);
       } else {
+        console.log("❌ CORS blocked origin:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
