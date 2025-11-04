@@ -36,7 +36,7 @@ const applyJob = async (req, res) => {
 
     res.status(201).json({
       message: "Application submitted successfully",  updatedJob: await Job.findById(jobId).populate("applicants", "name email profile"),
-      application,
+      application
     });
   } catch (err) {
     console.error("ApplyJob Error:", err);
