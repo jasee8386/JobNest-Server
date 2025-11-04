@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { updateProfile, getUserProfile } = require("../controllers/userController")
-const { registerController, loginController } = require("../controllers/employerController");
+const { registerController, loginController } = require("../controllers/authController");
 const { protect, authorize } = require("../middleware/authMiddleware");
 
 // Public routes
@@ -12,8 +12,7 @@ router.post("/login", loginController);
 router.get("/profile", protect, (req, res) => {
   res.json({ user: req.user });
 });
-//  Get logged-in user's profile
-router.get("/me", protect, getUserProfile);
+
 
 // Update logged-in user's profile
 router.put("/update", protect, updateProfile);

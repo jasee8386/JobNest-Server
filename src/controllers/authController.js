@@ -6,7 +6,7 @@ const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS)
 //-------REGISTER-------
 const registerController = async (req,res)=>{
   try {
-    const { name, email, password, role, profile } = req.body;
+    const { name, email, password, role } = req.body;
 
     // 1. Check required fields
     if (!name || !email || !password) {
@@ -23,12 +23,35 @@ const registerController = async (req,res)=>{
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     // 4. Create new user
+
+     let profile = {};
+
+    if (role === "jobseeker") {
+      profile = {
+        seeker: {
+          skills: [],
+          experience: "",
+          resume: "",
+          location: ""
+        }
+      };
+    } else if (role === "employer") {
+      profile = {
+        employer: {
+          companyName: "",
+          website: "",
+          address: "",
+          industry: ""
+        }
+      };
+    } else if (role === "admin") {
+      profile = {}; }
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
       role: role || "jobseeker",
-      profile: profile || {},
+      profile
     });
 
     await newUser.save();
@@ -95,4 +118,4 @@ const loginController = async (req, res) => {
 
 
 
-module.exports = {registerController,loginController}
+module.exports = {registerController,loginController}    
