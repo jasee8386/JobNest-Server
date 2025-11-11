@@ -1,33 +1,57 @@
 const Job = require("../models/Job");
-
+const Alert = require("../models/Alert");
+const User = require("../models/User");
 // Create a job
 const createJob = async (req, res) => {
-  try {
-    const { title, description, requirements, responsibilities, category, location, expiryDate } = req.body;
+    try {
+    console.log("🟢 Job creation request body:", req.body);
+    console.log("🟢 Authenticated user:", req.user);
 
-    const newJob = await Job.create({
+    const {
       title,
       description,
       requirements,
-      responsibilities,
       category,
       location,
-      employer: req.user.id,
-      isVerified: false,
-      applicants: [],
       expiryDate,
+    } = req.body;
+
+    const job = new Job({
+      title,
+      description,
+      requirements,
+      category,
+      location,
+      expiryDate,
+      employer: req.user._id, 
     });
 
-    res.status(201).json(newJob);
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    await job.save();
+    // ✅ Create alerts for matching seekers
+    const matchingSeekers = await User.find({
+      role: "seeker",
+      skills: { $in: requirements },
+    });
+
+    const alerts = matchingSeekers.map(seeker => ({
+      recipient: seeker._id,
+      type: "Job Alert",
+      message: `New job posted: ${title}`,
+      relatedJob: job._id,
+    }));
+
+if (alerts.length) await Alert.insertMany(alerts); 
+    res.status(201).json({ message: "Job created successfully", job });
+  } catch (error) {
+    console.error("❌ Job creation failed:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 // Get all jobs posted by employer
 const getMyJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user.id });
+    const jobs = await Job.find({ employer: req.user._id });
     res.json(jobs);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
@@ -37,7 +61,7 @@ const getMyJobs = async (req, res) => {
 // View applicants for a specific job
 const getJobApplicants = async (req, res) => {
   try {
-    const job = await Job.findOne({ _id: req.params.id, employer: req.user.id })
+    const job = await Job.findOne({ _id: req.params.id, employer: req.user._id })
       .populate({
         path: "applicants",
         populate: { path: "applicant", select: "name email profile" }, // applicant details

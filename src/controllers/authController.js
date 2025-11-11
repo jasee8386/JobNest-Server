@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS)
 //-------REGISTER-------
 const registerController = async (req,res)=>{
-  try {
+  try {console.log("📩 Register body:", req.body);
     const { name, email, password, role } = req.body;
 
     // 1. Check required fields
@@ -57,6 +57,8 @@ const registerController = async (req,res)=>{
     await newUser.save();
 
     // 5. Generate JWT token
+    console.log("🧩 newUser.role before token:", newUser.role);
+
     const token = generateToken(newUser);
 
     // 6. Send response
@@ -95,6 +97,8 @@ const loginController = async (req, res) => {
     }
 
     // 3. Generate JWT token
+    console.log("🧩 newUser.role before token:", user.role);
+
     const token = generateToken(user);
 
     // 4. Send response

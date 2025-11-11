@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.use(protect, authorize("jobseeker"));
 
-router.post("/:jobId/apply", applyJob);
-router.get("/my", myApplications);
+
+router.get("/my",myApplications);
 
 module.exports = router;

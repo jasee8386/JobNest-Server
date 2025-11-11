@@ -65,7 +65,7 @@ const applyJob = async (req, res) => {
     const job = await Job.findById(req.params.id);
     if (!job) return res.status(404).json({ message: "Job not found" });
 
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Prevent duplicate application
     const existingApp = await Application.findOne({

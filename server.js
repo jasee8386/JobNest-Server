@@ -10,11 +10,13 @@ const employerRoutes = require("./src/routes/employerRoutes");
 const jobseekerRoutes = require("./src/routes/jobseekerRoutes");
 const applicationRoutes = require("./src/routes/applicationRoutes");
 const chatRoutes = require("./src/routes/chatRoutes");
-
-dotenv.config() 
+const alertRoutes = require("./src/routes/alertRoutes")
+dotenv.config() ;
 connectDB();
+
+
   const allowedOrigins = [
-  "http://localhost:5173",
+  "http://localhost:5173","https://job-nest-client-tc9k.vercel.app",
   /\.vercel\.app$/,
 ];
 
@@ -34,11 +36,10 @@ app.use(
   })
 );
        
-const PORT=process.env.PORT
-//Middlewares
+const PORT=process.env.PORT || 3000
 
-app.use(express.json())//accepts all requests
 
+app.use(express.json())//accepts all requests;
 app.use("/api/user",authRoutes)
 app.use("/api/admin", adminRoutes);
 app.use("/api/jobs", jobRoutes); 
@@ -46,7 +47,7 @@ app.use("/api/employer", employerRoutes);
 app.use("/api/jobseeker", jobseekerRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/chats", chatRoutes);
-
+app.use("/api/alerts", alertRoutes);
 const { errorHandler } = require("./src/middleware/errorMiddleware");
 // 404 route
 app.use((req, res, next) => {

@@ -10,7 +10,10 @@ const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
       const user = await User.findById(decoded.id).select("-password");
+        console.log("🔍 decoded payload:", decoded);
+      console.log("🔍 DB user role:", user.role);
       if (!user) {
   return res.status(401).json({ message: "User not found" });
 }
@@ -32,6 +35,9 @@ req.user = {
 };
 const authorize = (...roles) => {
   return (req, res, next) => {
+    console.log("authorize check:", req.user.role);
+        console.log("authorize check:", req.user && req.user.role);
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ message: "Forbidden" });
     }

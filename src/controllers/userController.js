@@ -14,7 +14,7 @@ const updateProfile = async (req, res) => {
     });
 
     const user = await User.findByIdAndUpdate(
-      req.user.id,
+      req.user._id,
       { $set: filteredUpdates },
       { new: true, runValidators: true }
     ).select("-password"); // exclude password
@@ -31,7 +31,7 @@ const updateProfile = async (req, res) => {
 };// 🔹 Get logged-in user's full profile
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user._id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

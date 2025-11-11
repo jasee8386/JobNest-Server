@@ -7,13 +7,13 @@ const createChat = async (req, res) => {
 
     // check if chat already exists between same users for same job
     let chat = await Chat.findOne({
-      participants: { $all: [req.user.id, participantId] },
+      participants: { $all: [req.user._id, participantId] },
       relatedJob,
     });
 
     if (!chat) {
       chat = await Chat.create({
-        participants: [req.user.id, participantId],
+        participants: [req.user._id, participantId],
         relatedJob,
       });
     }
@@ -32,7 +32,7 @@ const sendMessage = async (req, res) => {
     const chat = await Chat.findById(chatId);
     if (!chat) return res.status(404).json({ message: "Chat not found" });
 
-    chat.messages.push({ sender: req.user.id, message });
+    chat.messages.push({ sender: req.user._id, message });
     await chat.save();
 
     res.json(chat);
@@ -44,7 +44,7 @@ const sendMessage = async (req, res) => {
 // Get user chats
 const getUserChats = async (req, res) => {
   try {
-    const chats = await Chat.find({ participants: req.user.id })
+    const chats = await Chat.find({ participants: req.user._id })
       .populate("participants", "name email")
       .populate("relatedJob", "title")  .populate("messages.sender", "name email");
 
@@ -61,7 +61,7 @@ const markAsRead = async (req, res) => {
     if (!chat) return res.status(404).json({ message: "Chat not found" });
 
     chat.messages.forEach(msg => {
-      if (!msg.isRead && msg.sender.toString() !== req.user.id) {
+      if (!msg.isRead && msg.sender.toString() !== req.user._id) {
         msg.isRead = true;
       }
     });
