@@ -17,8 +17,8 @@ const applicationSchema = new mongoose.Schema(
       default: "",
     },
     resume: {
-      type: String, // File path or cloud storage URL
-      required: true,
+      type: String, 
+     default:"",
     },
     status: {
       type: String,
