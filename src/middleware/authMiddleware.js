@@ -15,6 +15,7 @@ const protect = async (req, res, next) => {
         console.log("🔍 decoded payload:", decoded);
       console.log("🔍 DB user role:", user.role);
       if (!user) {
+         console.log("❌ User not found for token:", decoded);
   return res.status(401).json({ message: "User not found" });
 }
 
@@ -24,7 +25,7 @@ req.user = {
   role: user.role || decoded.role
 };
       next();
-    } catch (error) {
+    } catch (error) { console.error("❌ Token verification failed:", error.message);
       res.status(401).json({ message: "Not authorized, token failed" });
     }
   }
