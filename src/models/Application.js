@@ -4,12 +4,12 @@ const applicationSchema = new mongoose.Schema(
   {
     job: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Job", // Links to the job being applied for
+      ref: "Job", 
       required: true,
     },
     applicant: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Job seeker who applied
+      ref: "User", 
       required: true,
     },
     coverLetter: {

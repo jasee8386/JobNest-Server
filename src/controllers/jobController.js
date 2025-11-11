@@ -62,17 +62,28 @@ const getJobById = async (req, res) => {
 // Apply to a job
 const applyJob = async (req, res) => {
   try {
+       console.log("🎯 Apply route hit");
+    console.log("📦 Job ID:", req.params.id);
+    console.log("🧠 User:", req.user?._id);
     const job = await Job.findById(req.params.id);
-    if (!job) return res.status(404).json({ message: "Job not found" });
+    if (!job)  {
+      console.log("❌ Job not found");
+      return res.status(404).json({ message: "Job not found" });
+    }
 
     const userId = req.user._id;
+ if (!userId) {
+      console.log("❌ req.user missing");
+      return res.status(401).json({ message: "Unauthorized user" });
+    }
 
+    console.log("✅ Job found:", job.title);
     // Prevent duplicate application
     const existingApp = await Application.findOne({
       job: job._id,
       applicant: userId,
     });
-    if (existingApp) {
+    if (existingApp) {console.log("⚠️ Already applied");
       return res.status(400).json({ message: "Already applied to this job" });
     }
 
@@ -80,16 +91,16 @@ const applyJob = async (req, res) => {
     const newApplication = await Application.create({
       job: job._id,
       applicant: userId,
-      resume: req.body.resume, // resume URL/path from frontend
+      resume: req.body.resume|| "",
       coverLetter: req.body.coverLetter || "",
     });
-
+ console.log("✅ Application created:", newApplication._id);
     // Add reference in job
     job.applicants.push(newApplication._id);
     await job.save();
-
+  console.log("✅ Job updated with applicant");
     res.json({ message: "Application submitted", application: newApplication });
-  } catch (err) {
+  } catch (err) { console.error("❌ Apply Job Error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
